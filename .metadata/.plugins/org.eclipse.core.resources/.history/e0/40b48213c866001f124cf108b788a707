@@ -1,0 +1,52 @@
+package com.example.cabbook.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+import com.example.cabbook.entity.VehicleLocation;
+import com.example.cabbook.model.UserLocation;
+import com.example.cabbook.repository.VehicleLocationRepository;
+
+import java.util.List;
+
+@Service
+public class VehicleLocationService {
+
+    @Autowired
+    private VehicleLocationRepository vehicleLocationRepository;
+
+    @KafkaListener(topics = "vehicle_location", groupId = "group_id")
+    public void consumeVehicleLocation(VehicleLocation vehicleLocation) {
+        vehicleLocationRepository.save(vehicleLocation);
+    }
+
+    public String bookCab(UserLocation userLocation) {
+        List<VehicleLocation> vehicles = vehicleLocationRepository.findAll();
+        for (VehicleLocation vehicle : vehicles) {
+            if (isNearby(vehicle, userLocation)) {
+                return vehicle.getVehicleNumber() + " is assigned to user " + userLocation.getUserName();
+            }
+        }
+        return "Sorry! No vehicles found near your location";
+    }
+
+    private boolean isNearby(VehicleLocation vehicle, UserLocation userLocation) {
+        int vehicleLatInt = (int) Math.floor(vehicle.getLat());
+        int vehicleLonInt = (int) Math.floor(vehicle.getLongitude());
+
+        int userLatInt = (int) Math.floor(userLocation.getLat());
+        int userLonInt = (int) Math.floor(userLocation.getLongitude());
+
+        double vehicleLatDecimal = vehicle.getLat() - vehicleLatInt;
+        double vehicleLonDecimal = vehicle.getLongitude() - vehicleLonInt;
+
+        double userLatDecimal = userLocation.getLat() - userLatInt;
+        double userLonDecimal = userLocation.getLongitude() - userLonInt;
+
+        boolean isLatClose = Math.abs(vehicleLatDecimal - userLatDecimal) <= 0.01;
+        boolean isLonClose = Math.abs(vehicleLonDecimal - userLonDecimal) <= 0.01;
+
+        return vehicleLatInt == userLatInt && vehicleLonInt == userLonInt && isLatClose && isLonClose;
+    }
+}

@@ -1,0 +1,20 @@
+package com.example.cabbook.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.cabbook.model.UserLocation;
+import com.example.cabbook.service.VehicleLocationService;
+
+@RestController
+@RequestMapping("/cabbook")
+public class VehicleLocationController {
+
+    @Autowired
+    private VehicleLocationService vehicleLocationService;
+
+    @PostMapping("/book")
+    public String bookCab(@RequestBody UserLocation userLocation) {
+        return vehicleLocationService.bookCab(userLocation);
+    }
+}

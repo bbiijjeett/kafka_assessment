@@ -1,0 +1,5 @@
+package com.example.cabbook.model;
+
+public class UserLocation {
+
+}

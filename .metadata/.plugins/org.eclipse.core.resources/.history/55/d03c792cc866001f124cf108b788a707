@@ -1,0 +1,5 @@
+package com.example.cabbook.service;
+
+public class BookingService {
+
+}

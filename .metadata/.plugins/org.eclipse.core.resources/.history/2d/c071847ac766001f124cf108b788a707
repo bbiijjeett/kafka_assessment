@@ -1,0 +1,5 @@
+package com.example.vehicleloc.config;
+
+public class KafkaProducerConfig {
+
+}

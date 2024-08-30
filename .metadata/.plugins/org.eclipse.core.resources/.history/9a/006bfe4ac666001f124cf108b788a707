@@ -1,0 +1,5 @@
+package com.example.cabbook.entity;
+
+public class VehicleLocation {
+
+}

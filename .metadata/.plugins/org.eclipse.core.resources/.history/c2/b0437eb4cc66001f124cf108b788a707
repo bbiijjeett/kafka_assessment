@@ -1,0 +1,50 @@
+package com.example.cabbook.config;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.util.backoff.FixedBackOff;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@EnableKafka
+public class KafkaConsumerConfig {
+
+    @Bean
+    public ConsumerFactory<String, Object> consumerFactory() {
+        // Setting up Kafka consumer configuration properties
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "vehicle_group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        
+        // Add com.example.vehicleloc.entity to trusted packages
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.vehicleloc.entity, com.example.cabbook.entity, java.util, java.lang");
+
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(),
+                new ErrorHandlingDeserializer<>(new JsonDeserializer<>(Object.class)));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+
+        // Configure the error handler
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(
+            new FixedBackOff(1000L, 2)); // Retry twice with a backoff of 1 second
+
+        factory.setCommonErrorHandler(errorHandler);
+        return factory;
+    }
+}

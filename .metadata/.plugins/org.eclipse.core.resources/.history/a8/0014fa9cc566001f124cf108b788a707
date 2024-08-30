@@ -1,0 +1,5 @@
+package com.example.vehicleloc.service;
+
+public class VehicleLocationService {
+
+}

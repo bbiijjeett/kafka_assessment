@@ -1,0 +1,39 @@
+package com.example.vehicleloc.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.vehicleloc.entity.VehicleLocation;
+import com.example.vehicleloc.service.VehicleLocationService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/vehicle")
+public class VehicleLocationController {
+
+    @Autowired
+    private VehicleLocationService vehicleLocationService;
+
+    @PostMapping
+    public VehicleLocation createVehicle(@RequestBody VehicleLocation vehicle) {
+        return vehicleLocationService.saveVehicle(vehicle);
+    }
+
+    @GetMapping
+    public List<VehicleLocation> getAllVehicles() {
+        return vehicleLocationService.getAllVehicles();
+    }
+
+    @PostMapping("/generateloc")
+    public String generateLocations() {
+        vehicleLocationService.generateLocations();
+        return "Location generation started";
+    }
+
+    @PostMapping("/stopgen")
+    public String stopGeneratingLocations() {
+        vehicleLocationService.stopGenerating();
+        return "Location generation stopped";
+    }
+}

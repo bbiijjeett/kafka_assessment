@@ -1,0 +1,15 @@
+package com.example.vehicleloc.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Data
+public class VehicleLocation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String vehicleNumber;
+    private Double lat;
+    private Double longitude;
+}

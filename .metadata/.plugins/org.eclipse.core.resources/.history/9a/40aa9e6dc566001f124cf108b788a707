@@ -1,0 +1,5 @@
+package com.example.vehicleloc.entity;
+
+public class VehicleLocation {
+
+}

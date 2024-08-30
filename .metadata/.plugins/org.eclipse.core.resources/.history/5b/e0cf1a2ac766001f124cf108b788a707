@@ -1,0 +1,8 @@
+package com.example.vehicleloc.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.vehicleloc.entity.VehicleLocation;
+
+public interface VehicleLocationRepository extends JpaRepository<VehicleLocation, Integer> {
+}
